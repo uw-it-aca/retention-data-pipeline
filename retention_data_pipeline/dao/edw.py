@@ -9,10 +9,11 @@ def get_day1_enrollments(year, quarter):
     db_query = """
     SELECT
         CASE WHEN mm_spcl_program IN(1, 2, 13, 14, 16, 17, 31, 32, 33)
-         THEN CAST(1 AS BIT)
-         ELSE CAST(0 AS BIT)
-       END AS eop_student,
-    mm_system_key, mm_year, mm_qtr
+            THEN CAST(1 AS BIT)
+            ELSE CAST(0 AS BIT)
+        END AS eop_student,
+        (mm_year*10 + mm_qtr) as yrq,
+        mm_system_key, mm_year, mm_qtr
     FROM sec.sr_mini_master
     WHERE mm_year = {} AND mm_qtr = {} AND mm_proc_ind = 2
     """.format(year, quarter)
