@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  app:
+    environment:
+      - AUTH=SAML_MOCK
+    restart: always
+    container_name: app
+    build:
+      context: .
+    volumes:
+      - ./retention_data_pipeline:/app/retention_data_pipeline
+    ports:
+      - "8000:8000"
