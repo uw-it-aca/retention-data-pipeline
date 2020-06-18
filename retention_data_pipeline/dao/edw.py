@@ -14,9 +14,48 @@ def get_day1_enrollments(year, quarter):
         END AS eop_student,
         (mm_year*10 + mm_qtr) as yrq,
         mm_system_key, mm_year, mm_qtr
-    FROM sec.sr_mini_master
-    WHERE mm_year = {} AND mm_qtr = {} AND mm_proc_ind = 2
+    FROM 
+        sec.sr_mini_master
+    WHERE 
+        mm_year = {} AND mm_qtr = {} AND mm_proc_ind = 2
     """.format(year, quarter)
+    results = _run_query(db, db_query)
+    return results
+
+
+def get_ts_courses(year, quarter):
+    db_query = """
+    SELECT
+        ts_year,
+        ts_quarter,
+        course_no,
+        dept_abbrev,
+        section_id,
+        sln
+    FROM
+        sec.time_schedule
+    WHERE
+        ts_year = {}
+        AND ts_quarter = {}
+    """.format(year, quarter)
+    results = _run_query(db, db_query)
+    return results
+
+
+def get_registrations(year, quarter):
+    db_query = """
+        SELECT
+            system_key,
+            regis_yr,
+            regis_qtr,
+            sln
+        FROM
+            sec.registration_courses
+        WHERE
+            regis_yr = {}
+            AND regis_qtr = {}
+            AND request_status in ('A', 'C', 'R')
+        """.format(year, quarter)
     results = _run_query(db, db_query)
     return results
 
