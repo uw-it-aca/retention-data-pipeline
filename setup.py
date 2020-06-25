@@ -25,7 +25,8 @@ setup(
     install_requires=[
         'Django>=2.2,<3.0',
         'UW-RestClients-SWS>=2.2.7,<3.0',
-        'pyodbc<5'
+        'pyodbc<5',
+        'pandas'
     ],
     license='Apache License, Version 2.0',
     description='A tool for interacting with retention analytics data',

@@ -6,7 +6,7 @@ QUARTER_CHOICES = ((1, 'Winter'),
                    (4, 'Autumn'))
 
 
-class Student(models.Model):
+class RawStudent(models.Model):
     CAMPUS_CHOICES = ((1, 'Seattle'),
                       (2, 'Tacoma'),
                       (3, 'Bothell'))
@@ -25,7 +25,7 @@ class Student(models.Model):
     major_abbr = models.CharField(max_length=6)
 
 
-class Section(models.Model):
+class RawSection(models.Model):
     year = models.PositiveSmallIntegerField()
     quarter = models.PositiveSmallIntegerField(
         default=1, choices=QUARTER_CHOICES)
@@ -33,3 +33,37 @@ class Section(models.Model):
     dept_abbrev = models.CharField(max_length=6)
     section_id = models.CharField(max_length=3)
     sln = models.PositiveIntegerField()
+
+
+class Student(models.Model):
+    year = models.PositiveSmallIntegerField()
+    quarter = models.PositiveSmallIntegerField(
+        default=1, choices=QUARTER_CHOICES)
+
+
+class StudentRegistration(models.Model):
+    year = models.PositiveSmallIntegerField()
+    quarter = models.PositiveSmallIntegerField(
+        default=1, choices=QUARTER_CHOICES)
+    department_abbrev = models.CharField(max_length=6)
+    course_number = models.PositiveSmallIntegerField()
+    section_id = models.CharField(max_length=2)
+    system_key = models.PositiveIntegerField()
+    uw_netid = models.CharField(max_length=128)
+    student_no = models.PositiveIntegerField()
+    student_name_lowc = models.TextField()
+    is_international = models.BooleanField(default=False)
+    is_premajor = models.BooleanField(default=False)
+    is_eop = models.BooleanField(default=False)
+
+    @property
+    def course_id(self):
+        return "{}-{}-{}-{}-{}".format(self.year,
+                                       self.get_quarter_display().lower(),
+                                       self.department_abbrev,
+                                       self.course_number,
+                                       self.section_id)
+
+    @property
+    def yrq(self):
+        return self.year*10+self.quarter

@@ -1,8 +1,9 @@
 import os
 import pyodbc
+import pandas
 from django.conf import settings
 
-db = "UWSDBDataStore"
+DB = "UWSDBDataStore"
 
 
 def get_day1_enrollments(year, quarter):
@@ -14,12 +15,12 @@ def get_day1_enrollments(year, quarter):
         END AS eop_student,
         (mm_year*10 + mm_qtr) as yrq,
         mm_system_key, mm_year, mm_qtr
-    FROM 
+    FROM
         sec.sr_mini_master
-    WHERE 
+    WHERE
         mm_year = {} AND mm_qtr = {} AND mm_proc_ind = 2
     """.format(year, quarter)
-    results = _run_query(db, db_query)
+    results = _run_query(DB, db_query)
     return results
 
 
@@ -38,7 +39,7 @@ def get_ts_courses(year, quarter):
         ts_year = {}
         AND ts_quarter = {}
     """.format(year, quarter)
-    results = _run_query(db, db_query)
+    results = _run_query(DB, db_query)
     return results
 
 
@@ -56,7 +57,33 @@ def get_registrations(year, quarter):
             AND regis_qtr = {}
             AND request_status in ('A', 'C', 'R')
         """.format(year, quarter)
-    results = _run_query(db, db_query)
+    results = _run_query(DB, db_query)
+    return results
+
+
+def get_netids(year, quarter):
+    db_query = """
+        SELECT
+            system_key,
+            uw_netid,
+            student_no,
+            student_name_lowc
+        FROM
+            sec.student_1
+        WHERE
+            last_yr_enrolled = {}
+            AND last_qtr_enrolled = {}
+    """.format(year, quarter)
+    results = _run_query(DB, db_query)
+    return results
+
+
+def get_majors(year, quarter):
+
+    db_query = """
+        #TODO: Determine relationship w/ mini_maser and write query
+        """.format(year, quarter)
+    results = _run_query(DB, db_query)
     return results
 
 
@@ -75,6 +102,5 @@ def _run_query(database, query):
                 f"UID={user};" \
                 f"PWD={password}"
     con = pyodbc.connect(constring)
-    cursor = con.cursor()
-    cursor.execute(query)
-    return cursor
+    df = pandas.read_sql(query, con)
+    return df
