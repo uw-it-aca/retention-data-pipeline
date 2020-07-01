@@ -3,7 +3,8 @@ import os
 import pyodbc
 from django.conf import settings
 from retention_data_pipeline.dao import edw
-from retention_data_pipeline.data_import.registrations import get_students_for_term
+from retention_data_pipeline.data_import.registrations import \
+    get_students_for_term, _add_international_status
 
 
 class Command(BaseCommand):
@@ -30,7 +31,12 @@ class Command(BaseCommand):
         #     print(row)
         # reg = edw.get_registrations(2020, 2)
         # print(reg.fetchone())
-        get_students_for_term(2020, 2)
-        # enr = edw.get_day1_enrollments(2020, 2)
+        # get_students_for_term(2020, 2)
+        # enr = edw.get_international_students(2020, 2)
         # for index, row in enr.iterrows():
         #     print(row)
+        _add_international_status(2020, 2)
+        # query = """
+        # """
+        # res = edw._run_query("UWSDBDataStore", query)
+        # print(res)

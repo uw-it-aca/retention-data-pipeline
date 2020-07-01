@@ -20,7 +20,8 @@ def get_day1_enrollments(year, quarter):
                 ELSE CAST(0 AS BIT)
             END AS eop_student,
             (mm.mm_year*10 + mm.mm_qtr) as yrq,
-            ROW_NUMBER() OVER (PARTITION BY mm.mm_system_key ORDER BY mm.mm_system_key) AS rn,
+            ROW_NUMBER() OVER
+            (PARTITION BY mm.mm_system_key ORDER BY mm.mm_system_key) AS rn,
             mm_system_key, mm.mm_year, mm.mm_qtr, mm_deg_level, mm_major_abbr
         FROM
             sec.sr_mini_master mm
@@ -89,6 +90,19 @@ def get_netids(year, quarter):
             last_yr_enrolled = {}
             AND last_qtr_enrolled = {}
     """.format(year, quarter)
+    results = _run_query(DB, db_query)
+    return results
+
+
+def get_international_students():
+    db_query = """
+        SELECT
+            SDBSrcSystemKey,
+            InternationalStudentInd
+        FROM EDWPresentation.sec.dimStudent
+        WHERE
+            InternationalStudentInd = 'Y'
+    """
     results = _run_query(DB, db_query)
     return results
 
