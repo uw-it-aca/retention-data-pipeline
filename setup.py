@@ -26,7 +26,8 @@ setup(
         'Django>=2.2,<3.0',
         'UW-RestClients-SWS>=2.2.7,<3.0',
         'pyodbc<5',
-        'pandas'
+        'pandas',
+        'psycopg2'
     ],
     license='Apache License, Version 2.0',
     description='A tool for interacting with retention analytics data',

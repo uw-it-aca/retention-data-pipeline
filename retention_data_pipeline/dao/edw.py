@@ -7,19 +7,34 @@ DB = "UWSDBDataStore"
 
 
 def get_day1_enrollments(year, quarter):
+    """
+    Returns a list of student system_keys enrolled on day one and EOP status
+    """
+    campus = 0
     db_query = """
-    SELECT
-        CASE WHEN mm_spcl_program IN(1, 2, 13, 14, 16, 17, 31, 32, 33)
-            THEN CAST(1 AS BIT)
-            ELSE CAST(0 AS BIT)
-        END AS eop_student,
-        (mm_year*10 + mm_qtr) as yrq,
-        mm_system_key, mm_year, mm_qtr
-    FROM
-        sec.sr_mini_master
-    WHERE
-        mm_year = {} AND mm_qtr = {} AND mm_proc_ind = 2
-    """.format(year, quarter)
+    SELECT  *
+    FROM    (
+        SELECT
+            CASE WHEN mm_spcl_program IN(1, 2, 13, 14, 16, 17, 31, 32, 33)
+                THEN CAST(1 AS BIT)
+                ELSE CAST(0 AS BIT)
+            END AS eop_student,
+            (mm.mm_year*10 + mm.mm_qtr) as yrq,
+            ROW_NUMBER() OVER (PARTITION BY mm.mm_system_key ORDER BY mm.mm_system_key) AS rn,
+            mm_system_key, mm.mm_year, mm.mm_qtr, mm_deg_level, mm_major_abbr
+        FROM
+            sec.sr_mini_master mm
+        INNER JOIN sec.sr_mini_master_deg_program deg
+            ON deg.mm_student_no = mm.mm_student_no
+            AND deg.mm_year = mm.mm_year
+            AND deg.mm_qtr = mm.mm_qtr
+        WHERE
+            mm.mm_year = {}
+            AND mm.mm_qtr = {}
+            AND mm.mm_proc_ind = 2
+            AND deg.mm_branch = {}) as a
+    WHERE  a.rn = 1
+    """.format(year, quarter, campus)
     results = _run_query(DB, db_query)
     return results
 

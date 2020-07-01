@@ -39,6 +39,14 @@ class Student(models.Model):
     year = models.PositiveSmallIntegerField()
     quarter = models.PositiveSmallIntegerField(
         default=1, choices=QUARTER_CHOICES)
+    system_key = models.PositiveIntegerField()
+    uw_netid = models.CharField(max_length=128, null=True)
+    is_international = models.BooleanField(default=False)
+    is_premajor = models.BooleanField(default=False)
+    is_eop = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = [['year', 'quarter', 'system_key']]
 
 
 class StudentRegistration(models.Model):

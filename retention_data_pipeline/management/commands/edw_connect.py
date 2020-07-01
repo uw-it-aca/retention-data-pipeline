@@ -3,6 +3,7 @@ import os
 import pyodbc
 from django.conf import settings
 from retention_data_pipeline.dao import edw
+from retention_data_pipeline.data_import.registrations import get_students_for_term
 
 
 class Command(BaseCommand):
@@ -27,5 +28,9 @@ class Command(BaseCommand):
         # row = cursor.fetchone()
         # if row:
         #     print(row)
-        reg = edw.get_registrations(2020, 2)
-        print(reg.fetchone())
+        # reg = edw.get_registrations(2020, 2)
+        # print(reg.fetchone())
+        get_students_for_term(2020, 2)
+        # enr = edw.get_day1_enrollments(2020, 2)
+        # for index, row in enr.iterrows():
+        #     print(row)
