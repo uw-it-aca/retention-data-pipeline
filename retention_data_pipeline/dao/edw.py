@@ -77,7 +77,7 @@ def get_registrations(year, quarter):
     return results
 
 
-def get_netids(year, quarter):
+def get_student_metadata():
     db_query = """
         SELECT
             system_key,
@@ -86,10 +86,7 @@ def get_netids(year, quarter):
             student_name_lowc
         FROM
             sec.student_1
-        WHERE
-            last_yr_enrolled = {}
-            AND last_qtr_enrolled = {}
-    """.format(year, quarter)
+    """
     results = _run_query(DB, db_query)
     return results
 

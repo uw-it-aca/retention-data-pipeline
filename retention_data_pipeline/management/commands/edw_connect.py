@@ -35,8 +35,9 @@ class Command(BaseCommand):
         # enr = edw.get_international_students(2020, 2)
         # for index, row in enr.iterrows():
         #     print(row)
-        _add_international_status(2020, 2)
+        # _add_international_status(2020, 2)
         # query = """
         # """
         # res = edw._run_query("UWSDBDataStore", query)
         # print(res)
+        get_students_for_term(2020, 2)

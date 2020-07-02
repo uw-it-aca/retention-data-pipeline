@@ -41,6 +41,8 @@ class Student(models.Model):
         default=1, choices=QUARTER_CHOICES)
     system_key = models.PositiveIntegerField()
     uw_netid = models.CharField(max_length=128, null=True)
+    student_no = models.PositiveIntegerField(null=True)
+    student_name_lowc = models.TextField(null=True)
     is_international = models.BooleanField(default=False)
     is_premajor = models.BooleanField(default=False)
     is_eop = models.BooleanField(default=False)
