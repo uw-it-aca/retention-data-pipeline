@@ -1,2 +1,2 @@
 # retention-data-pipeline
-App for getting data into RAD
+App for getting data into RAD app
