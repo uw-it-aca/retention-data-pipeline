@@ -2,7 +2,7 @@ FROM acait/django-container:1.0.35 as app-container
 
 USER root
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install libpq-dev postgresql postgresql-contrib -y
+RUN apt-get update && apt-get install libpq-dev postgresql postgresql-contrib unixodbc-dev -y
 USER acait
 
 ADD --chown=acait:acait retention_data_pipeline/VERSION /app/retention_data_pipeline/
