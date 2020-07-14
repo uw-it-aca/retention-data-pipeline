@@ -1,23 +1,15 @@
 #!/bin/sh
-set -e
-trap 'exit 1' ERR
+trap catch ERR
 
 # travis test script for django app
 #
-# PRECONDITION: inherited env vars from application's .travis.yml MUST include:
-#      DJANGO_APP: django application directory name
+# PRECONDITIONS:
+#      * necessary test tooling already installed
+#      * inherited env vars from application's .travis.yml MUST include:
+#        DJANGO_APP: django application directory name
 
 # start virtualenv
 source bin/activate
-
-# install test tooling
-pip install pycodestyle coverage
-apt-get install -y nodejs npm
-npm install -g npm@latest
-hash -r
-
-npm install -g eslint@5.0.0 stylelint@13.3.3 eslint-plugin-vue
-npm install
 
 function run_test {
     echo "##########################"
@@ -25,16 +17,25 @@ function run_test {
     eval $1
 }
 
-run_test "pycodestyle ${DJANGO_APP}/ --exclude='migrations,resources,static'"
+function catch {
+    echo "Test failure occurred on line $LINENO"
+    exit 1
+}
+
+run_test "pycodestyle ${DJANGO_APP}/ --exclude=migrations,static"
 
 
-run_test "eslint --ext .js,.vue retention_dashboard/static/retention_dashboard/js/"
+if [ -d ${DJANGO_APP}/static/${DJANGO_APP}/js ]; then
+    run_test "jshint ${DJANGO_APP}/static/${DJANGO_APP}/js --verbose"
+elif [ -d ${DJANGO_APP}/static/js ]; then
+    run_test "jshint ${DJANGO_APP}/static/js --verbose"
+fi
 
-run_test "stylelint 'retention_dashboard/**/*.vue' 'retention_dashboard/**/*.scss' "
-run_test "coverage run --source=${DJANGO_APP} '--omit=*/migrations/*' manage.py test ${DJANGO_APP}"
 
-ls -lah
+run_test "FORCE_VIEW_TESTS=1 coverage run --source=${DJANGO_APP} '--omit=*/migrations/*' manage.py test ${DJANGO_APP}"
+
 # put generaged coverage result where it will get processed
-cp .coverage /coverage
+cp .coverage.* /coverage
+cp coverage/lcov.info /coverage
 
 exit 0
