@@ -1,0 +1,42 @@
+sudo: required
+
+language: python
+python:
+  - 3.6
+
+services:
+  - docker
+
+os:
+  - linux
+
+env:
+  global:
+    - RELEASE_NAME="retention-data-pipeline"
+    - DJANGO_APP="retention_data_pipeline"
+    - COMMIT_HASH="$(git rev-parse --short=7 HEAD)"
+    - IMAGE_TAG="${RELEASE_NAME}:${COMMIT_HASH}"
+    - DEPLOY_SCRIPT_BASE=https://raw.githubusercontent.com/uw-it-aca/gcp-app-deploy/master
+
+install:
+  - docker build --target app-container -t "$IMAGE_TAG" .
+  - docker build -t app-test-container .
+
+before_script:
+  - gem install coveralls-lcov
+  - pip install coverage
+  - pip install coveralls
+
+script:
+  - docker run -u root -it -v /tmp:/coverage -e DJANGO_APP="$DJANGO_APP" -e "ENV=localdev" app-test-container bash -c ". ./travis-ci/test.sh"
+
+after_success:
+  - cp /tmp/.coverage.* /tmp/lcov.info .
+  - coverage combine
+  - coveralls-lcov -v -n lcov.info > js-coverage.json
+  - coveralls --merge=js-coverage.json
+
+cache:
+  directories:
+    - "$HOME/helm"
+    - "$HOME/kubeval"

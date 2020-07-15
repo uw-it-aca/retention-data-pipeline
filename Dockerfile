@@ -1,19 +1,19 @@
-FROM acait/django-container:1.0.22 as django
+FROM acait/django-container:1.0.35 as app-container
 
 USER root
-RUN apt-get update
-RUN apt-get install -y libpq-dev unixodbc-dev freetds-dev tdsodbc
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install libpq-dev postgresql postgresql-contrib unixodbc-dev -y
 USER acait
 
 ADD --chown=acait:acait retention_data_pipeline/VERSION /app/retention_data_pipeline/
 ADD --chown=acait:acait setup.py /app/
 ADD --chown=acait:acait requirements.txt /app/
-
 RUN . /app/bin/activate && pip install -r requirements.txt
-RUN . /app/bin/activate && pip install psycopg2
 
 ADD --chown=acait:acait . /app/
-#ADD --chown=acait:acait docker/app_deploy.sh /scripts/app_deploy.sh
-#ADD --chown=acait:acait docker/ project/
-#RUN chmod u+x /scripts/app_deploy.sh
-RUN . /app/bin/activate
+ADD --chown=acait:acait docker/ project/
+
+FROM acait/django-test-container:1.0.35 as app-test-container
+
+COPY --from=0 /app/ /app/
+COPY --from=0 /static/ /static/
