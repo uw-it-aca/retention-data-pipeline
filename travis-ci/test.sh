@@ -36,6 +36,5 @@ run_test "FORCE_VIEW_TESTS=1 coverage run --source=${DJANGO_APP} '--omit=*/migra
 
 # put generaged coverage result where it will get processed
 cp .coverage /coverage -r
-cp coverage/lcov.info /coverage
 
 exit 0
