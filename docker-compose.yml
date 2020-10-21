@@ -4,6 +4,8 @@ services:
   app:
     environment:
       - AUTH=SAML_MOCK
+      - EDW_USER
+      - EDW_PASSWORD
     restart: always
     container_name: app
     build:
